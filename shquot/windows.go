@@ -4,26 +4,98 @@ import (
 	"strings"
 )
 
-// WindowsArgv quotes arguments using the conventions expected by the Windows
-// API function CommandLineToArgvW.
+// WindowsArgv quotes arguments using conventions that lead to correct parsing
+// by both the Windows API function CommandLineToArgvW and the parse_cmdline
+// function in the Microsoft Visual C++ runtime library.
 //
 // On Windows the final parsing of a command line string is the responsibility
-// of the application itself, and so some applications may not honor these
-// conventions but most modern command line applications do, due to this step
-// being handled automatically by the Microsoft Visual C++ runtime library
-// prior to calling the application's entry point.
+// of the application itself, and so an application may employ any strategy
+// it wishes to parse the command line.
+//
+// In practice though, most command line Windows applications receive their
+// arguments via the argv/argc parameters to function main, which contain the
+// result of calling parse_cmdline.
+//
+// Windows GUI applications receive a command line string as one argument to
+// WinMain, but it has already been partially processed to remove the first
+// argument that is conventionally the program name. Windows applications may
+// instead choose to call GetCommandLine to obtain the full original string
+// and then process it with the API function CommandLineToArgvW to obtain
+// an argv/argc pair.
+//
+// The parse_cmdline and CommandLineToArgvW implementations do not have
+// identical behavior, but their behavior is compatible enough that this
+// function can produce a string that can be processed successfully by both.
+// For applications that use neither of these mechanisms there is no guarantee
+// that any particular quoting scheme will work.
+//
+// In particular note that programs that are not written in C or C++ (e.g.
+// batch files, cmd scripts, Windows Script Host programs, .NET Framework
+// applications, etc) are likely to have divergent processing rules that this
+// function cannot guarantee to support.
+//
+// There is one important caveat with this function: neither of the "argv"
+// construction approaches supports escaping of quotes in the first argument,
+// so quote characters cannot be reliably supported there. If any are found,
+// this function will strip them out. In practice a quote character is never
+// valid in a program name on Windows and so this should have no practical
+// impact, but if you wish to detect that scenario you can first call
+// WindowsArgvValid to determine whether a particular command line slice can be
+// losslessly encoded by WindowsArgv.
 func WindowsArgv(cmdline []string) string {
 	if len(cmdline) == 0 {
 		return ""
 	}
 
+	// The rules here were derived from the information at the following sources,
+	// since the Windows API and Visual C++ Runtime documentation are both
+	// incomplete:
+	// http://www.windowsinspired.com/how-a-windows-programs-splits-its-command-line-into-individual-arguments/
+	// http://daviddeley.com/autohotkey/parameters/parameters.htm
+
 	var buf strings.Builder
-	windowsArgvSingle(cmdline[0], &buf)
+	windowsArgvFirst(cmdline[0], &buf)
 	for _, a := range cmdline[1:] {
 		buf.WriteByte(' ')
 		windowsArgvSingle(a, &buf)
 	}
 	return buf.String()
+}
+
+// WindowsArgvValid is a helper for use alongside WindowsArgv to deal with the
+// fact that the commonly-used Windows command line parsers do not support
+// escaping of quotes in the first element of the command line.
+//
+// This function returns false if the first element of the given cmdline contains
+// quote characters, or true otherwise. If this function returns false then
+// the return value of WindowsArgv for the same cmdline may be lossy.
+func WindowsArgvValid(cmdline []string) bool {
+	if len(cmdline) == 0 {
+		return true
+	}
+
+	return !strings.ContainsRune(cmdline[0], '"')
+}
+
+func windowsArgvFirst(a string, to *strings.Builder) {
+	// The first argument in a string processed by either parse_cmdline or
+	// CommandLineToArgvW is handled using a distinct set of rules that differ
+	// significantly between the two implementations, but if we ensure the
+	// string always starts and ends with a quote mark and contains no
+	// intervening quotes then it can be processed by both.
+	// Since there is no mechanism to escape quotes, they are just stripped
+	// out altogether by this function.
+	to.WriteByte('"')
+	for {
+		quot := strings.Index(a, `"`)
+		if quot == -1 { // No quotes left, so everything else is literal and we're done,
+			to.WriteString(a)
+			break
+		}
+		to.WriteString(a[:quot])
+		a = a[quot+1:] // skip over quote altogether, stripping it out
+	}
+	to.WriteByte('"')
 }
 
 func windowsArgvSingle(a string, to *strings.Builder) {

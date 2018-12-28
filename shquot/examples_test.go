@@ -15,7 +15,7 @@ func Example() {
 
 	// Output:
 	// POSIXShell: echo 'Hello, world!'
-	// WindowsArgv: echo "Hello, world!"
-	// WindowsCmdExe+WindowsArgv: echo ^"Hello, world^!^"
+	// WindowsArgv: "echo" "Hello, world!"
+	// WindowsCmdExe+WindowsArgv: ^"echo^" ^"Hello, world^!^"
 	// Dockerfile: ["echo","Hello, world!"]
 }
