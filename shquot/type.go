@@ -9,4 +9,7 @@ package shquot
 // conventionally the command itself and any remaining elements are arguments
 // to that command. This mimics the way command lines are passed to the execve
 // function on a Unix (POSIX) system.
+//
+// The strings in cmdline are assumed to be UTF-8 encoded. If not, the results
+// of some functions may be incorrect.
 type Q func(cmdline []string) string
