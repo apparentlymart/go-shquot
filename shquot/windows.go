@@ -165,6 +165,8 @@ func WindowsCmdExe(wrapped Q) Q {
 		">", "^>",
 		"&", "^&",
 		"|", "^|",
+		"\r\n", "^\r\n\r\n",
+		"\n", "^\n\n",
 	)
 	return func(cmdline []string) string {
 		s := wrapped(cmdline)

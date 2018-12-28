@@ -90,6 +90,10 @@ func TestWindowsCmdExe(t *testing.T) {
 			`^"echo^" ^"hello world\\\^"^"`,
 		},
 		{
+			[]string{`echo`, "hello\nworld"},
+			"^\"echo^\" ^\"hello^\n\nworld^\"",
+		},
+		{
 			[]string{`echo`, `hello "world"`},
 			`^"echo^" ^"hello \^"world\^"^"`,
 		},
