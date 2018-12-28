@@ -27,7 +27,7 @@ func WindowsArgv(cmdline []string) string {
 }
 
 func windowsArgvSingle(a string, to *strings.Builder) {
-	if !strings.ContainsAny(a, " \t\n\v\"") {
+	if len(a) > 0 && !strings.ContainsAny(a, " \t\n\v\"") {
 		// No quoting required, then.
 		to.WriteString(a)
 		return

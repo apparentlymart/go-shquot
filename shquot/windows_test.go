@@ -19,6 +19,10 @@ func TestWindowsArgv(t *testing.T) {
 			`echo hello`,
 		},
 		{
+			[]string{`echo`, ``},
+			`echo ""`,
+		},
+		{
 			[]string{`echo`, `hello world`},
 			`echo "hello world"`,
 		},
