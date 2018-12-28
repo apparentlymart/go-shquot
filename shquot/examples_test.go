@@ -14,7 +14,7 @@ func Example() {
 	fmt.Println("Dockerfile:", shquot.Dockerfile(cmdline))
 
 	// Output:
-	// POSIXShell: echo 'Hello, world!'
+	// POSIXShell: 'echo' 'Hello, world!'
 	// WindowsArgv: "echo" "Hello, world!"
 	// WindowsCmdExe+WindowsArgv: ^"echo^" ^"Hello, world^!^"
 	// Dockerfile: ["echo","Hello, world!"]

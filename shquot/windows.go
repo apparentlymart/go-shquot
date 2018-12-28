@@ -153,6 +153,9 @@ func windowsArgvSingle(a string, to *strings.Builder) {
 // that will pass through the command interpreter, such as generated command
 // scripts. If you're calling the Windows CreateProcess API directly then you
 // must not apply cmd.exe quoting, or the result will be incorrectly parsed.
+//
+// This function cannot prevent expansion of Console Aliases, so the result
+// is safe to run only in a command interpreter with no aliases configured.
 func WindowsCmdExe(wrapped Q) Q {
 	r := strings.NewReplacer(
 		"(", "^(",

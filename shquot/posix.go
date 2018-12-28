@@ -27,13 +27,16 @@ const (
 //
 // This function assumes a shell with the default value of the "IFS" variable,
 // such that a single space will be interpreted as an argument separator.
+//
+// The first argument is always quoted so that it will bypass alias expansion
+// and function call behaviors in compliant shells.
 func POSIXShell(cmdline []string) string {
 	if len(cmdline) == 0 {
 		return ""
 	}
 
 	var buf strings.Builder
-	posixShellSingle(cmdline[0], &buf)
+	posixShellSingleQuoted(cmdline[0], &buf)
 	for _, a := range cmdline[1:] {
 		buf.WriteByte(' ')
 		posixShellSingle(a, &buf)

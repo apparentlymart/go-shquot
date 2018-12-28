@@ -13,11 +13,11 @@ func TestUnixTerminal(t *testing.T) {
 		},
 		{
 			[]string{"echo", "\x1b[0;0HHello, world!"},
-			"echo '\x14\x1b[0;0HHello, world!'",
+			"'echo' '\x14\x1b[0;0HHello, world!'",
 		},
 		{
 			[]string{"echo", "\x14\x1b[0;0HHello, world!"},
-			"echo '\x14\x14\x14\x1b[0;0HHello, world!'",
+			"'echo' '\x14\x14\x14\x1b[0;0HHello, world!'",
 		},
 	}
 

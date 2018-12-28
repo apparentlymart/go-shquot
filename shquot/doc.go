@@ -14,4 +14,11 @@
 // Since each shell or intermediary has different details, it's important to
 // select the correct quoting function for the target system or else the
 // result may be misinterpreted.
+//
+// The goal of functions in this package is to cause a command line to be
+// interpreted as if it were passed to the "execve" C function, bypassing any
+// special behaviors of intermediaries such as wildcard expansion, alias
+// expansion, pipelines, etc. If any shell behaviors are accessible through
+// crafted input to the corresponding function then that's always considered
+// to be a bug unless specifically noted in the documentation for that function.
 package shquot
