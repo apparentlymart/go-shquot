@@ -19,3 +19,11 @@ func Example() {
 	// WindowsCmdExe+WindowsArgv: ^"echo^" ^"Hello, world^!^"
 	// Dockerfile: ["echo","Hello, world!"]
 }
+
+func ExampleViaPowerShell() {
+	cmdline := []string{`echo`, `Hello, world!`}
+	fmt.Println(shquot.ViaPowerShell(shquot.WindowsArgvSplit)(cmdline))
+
+	// Output:
+	// & Start-Process -FilePath "echo" -ArgumentList "`"Hello, world!`""
+}

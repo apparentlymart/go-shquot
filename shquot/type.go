@@ -18,6 +18,12 @@ import (
 // of some functions may be incorrect.
 type Q func(cmdline []string) string
 
+// QS is a variant of Q that returns separate arguments for the unquoted
+// command name (first element of cmdline, usually verbatim) and quoted
+// remaining arguments, for use with intermediaries that require the command
+// name to be provided out-of-band.
+type QS func(cmdline []string) (cmd, args string)
+
 // QV is the signature of a function that checks if a given cmdline is valid.
 // It returns true if the command line meets some validation constraint and
 // false otherwise.

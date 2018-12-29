@@ -44,6 +44,24 @@ func POSIXShell(cmdline []string) string {
 	return buf.String()
 }
 
+// POSIXShellSplit is a variant of POSIXShell that isolates the first argument
+// (conventionally the program name) and returns it verbatim along with a quoted
+// version of the remaining arguments.
+func POSIXShellSplit(cmdline []string) (cmd, args string) {
+	if len(cmdline) == 0 {
+		return "", ""
+	}
+
+	var buf strings.Builder
+	for i, a := range cmdline[1:] {
+		if i > 0 {
+			buf.WriteByte(' ')
+		}
+		posixShellSingle(a, &buf)
+	}
+	return cmdline[0], buf.String()
+}
+
 func posixShellSingle(a string, to *strings.Builder) {
 	if len(a) == 0 {
 		to.WriteString("''")

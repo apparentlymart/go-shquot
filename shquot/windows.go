@@ -62,6 +62,30 @@ func WindowsArgv(cmdline []string) string {
 	return buf.String()
 }
 
+// WindowsArgvSplit is a variant of WindowsArgv that quotes only the arguments
+// in the given command line -- that is, indices 1 and greater in the given
+// slice -- and just returns the command from index 0 verbatim to be quoted
+// by another layer.
+//
+// This is useful for Windows-style process-starting APIs where the command
+// itself is isolated but the arguments are provided as a single, already-quoted
+// string.
+func WindowsArgvSplit(cmdline []string) (cmd, args string) {
+	if len(cmdline) == 0 {
+		return "", ""
+	}
+
+	cmd = cmdline[0]
+	var buf strings.Builder
+	for i, a := range cmdline[1:] {
+		if i > 0 {
+			buf.WriteByte(' ')
+		}
+		windowsArgvSingle(a, &buf)
+	}
+	return cmd, buf.String()
+}
+
 // WindowsArgvValid is a helper for use alongside WindowsArgv to deal with the
 // fact that the commonly-used Windows command line parsers do not support
 // escaping of quotes in the first element of the command line.
